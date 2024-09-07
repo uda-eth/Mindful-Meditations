@@ -15,6 +15,7 @@ const nextConfig = {
   // Environment variables that should be exposed to the browser
   env: {
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+    PROJECT_ID: 'speech-to-text-project-434005', // Replace with your actual project ID
   },
 
   // If you're using custom server-side environment variables, list them here
