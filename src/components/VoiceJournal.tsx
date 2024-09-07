@@ -2,11 +2,17 @@
 import React, { useState, useEffect } from 'react';
 import { useReactMediaRecorder } from 'react-media-recorder';
 
+interface JournalEntry {
+  id: string | number;
+  transcript: string;
+  createdAt: string | number | Date;
+}
+
 const VoiceJournal: React.FC = () => {
   const [transcript, setTranscript] = useState('');
   const [isTranscribing, setIsTranscribing] = useState(false);
-  const [pastEntries, setPastEntries] = useState([]);
-  const [selectedEntry, setSelectedEntry] = useState(null);
+  const [pastEntries, setPastEntries] = useState<JournalEntry[]>([]);
+  const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
   const [showPopup, setShowPopup] = useState(false);
   const { status, startRecording, stopRecording, mediaBlobUrl } = useReactMediaRecorder({ audio: true });
 
@@ -55,6 +61,7 @@ const VoiceJournal: React.FC = () => {
       }
 
       const data = await response.json();
+      console.log('Transcription response:', data); // Add this line
       setTranscript(data.transcript);
 
       await saveTranscriptToDatabase(data.transcript);
@@ -69,7 +76,7 @@ const VoiceJournal: React.FC = () => {
 
   const saveTranscriptToDatabase = async (transcriptText: string) => {
     try {
-      console.log('Saving transcript:', transcriptText); // Add this line
+      console.log('Saving transcript:', transcriptText);
       const response = await fetch('/api/save-journal-entry', {
         method: 'POST',
         headers: {
@@ -82,18 +89,18 @@ const VoiceJournal: React.FC = () => {
         throw new Error('Failed to save journal entry');
       }
 
-      const savedEntry = await response.json(); // Add this line
-      console.log('Journal entry saved successfully:', savedEntry); // Add this line
-      fetchPastEntries(); // Refresh past entries after saving
+      const savedEntry = await response.json();
+      console.log('Journal entry saved successfully:', savedEntry);
+      await fetchPastEntries(); // Refresh past entries after saving
     } catch (error) {
       console.error('Error saving journal entry:', error);
     }
   };
 
-  const handleEntrySelect = (event) => {
+  const handleEntrySelect = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedId = event.target.value;
     if (selectedId) {
-      const entry = pastEntries.find(e => e.id.toString() === selectedId);
+      const entry = pastEntries.find(e => e.id.toString() === selectedId) || null;
       setSelectedEntry(entry);
       setShowPopup(true);
     }
