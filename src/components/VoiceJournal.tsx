@@ -25,7 +25,7 @@ const VoiceJournal: React.FC = () => {
       const response = await fetch('/api/get-journal-entries');
       if (response.ok) {
         const entries = await response.json();
-        console.log('Fetched entries:', entries); // Add this line
+        console.log('Fetched entries:', entries);
         setPastEntries(entries);
       } else {
         console.error('Failed to fetch entries:', response.statusText);
@@ -46,31 +46,48 @@ const VoiceJournal: React.FC = () => {
     }
 
     setIsTranscribing(true);
+    console.log('Starting transcription process');
+
     try {
+      console.log('Fetching audio blob from URL');
       const audioBlob = await fetch(mediaBlobUrl).then(r => r.blob());
+      console.log('Audio blob fetched, size:', audioBlob.size, 'bytes');
+      if (audioBlob.size > 10 * 1024 * 1024) { // 10MB limit
+        throw new Error('Audio file is too large. Please record a shorter message.');
+      }
+
       const formData = new FormData();
       formData.append('audio', audioBlob, 'recording.wav');
+      console.log('FormData created with audio blob');
 
+      console.log('Sending request to /api/transcribe');
       const response = await fetch('/api/transcribe', {
         method: 'POST',
         body: formData,
       });
+      console.log('Response received, status:', response.status);
 
       if (!response.ok) {
-        throw new Error('Failed to transcribe audio');
+        throw new Error(`Failed to transcribe audio: ${response.status} ${response.statusText}`);
       }
 
+      console.log('Parsing response JSON');
       const data = await response.json();
-      console.log('Transcription response:', data); // Add this line
-      setTranscript(data.transcript);
+      console.log('Transcription response:', data);
 
+      setTranscript(data.transcript);
+      console.log('Transcript set in state');
+
+      console.log('Saving transcript to database');
       await saveTranscriptToDatabase(data.transcript);
+      console.log('Transcript saved to database');
 
     } catch (error) {
-      console.error('Error transcribing audio:', error);
+      console.error('Error in transcription process:', error);
       setTranscript('Error transcribing audio. Please try again.');
     } finally {
       setIsTranscribing(false);
+      console.log('Transcription process completed');
     }
   };
 
@@ -103,6 +120,24 @@ const VoiceJournal: React.FC = () => {
       const entry = pastEntries.find(e => e.id.toString() === selectedId) || null;
       setSelectedEntry(entry);
       setShowPopup(true);
+    }
+  };
+
+  const handleCleanup = async () => {
+    console.log('Cleanup function called');
+    try {
+      const response = await fetch('/api/cleanup-empty-entries', { method: 'POST' });
+      console.log('Cleanup response status:', response.status);
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Cleanup response data:', data);
+        await fetchPastEntries();
+        console.log('Fetched past entries after cleanup');
+      } else {
+        console.error('Failed to clean up empty entries');
+      }
+    } catch (error) {
+      console.error('Error during cleanup:', error);
     }
   };
 
@@ -163,6 +198,12 @@ const VoiceJournal: React.FC = () => {
           </div>
         </div>
       )}
+      <button
+        className="px-4 py-2 rounded bg-red-500 text-white mt-4"
+        onClick={handleCleanup}
+      >
+        Clean Up Empty Entries
+      </button>
     </div>
   );
 };
