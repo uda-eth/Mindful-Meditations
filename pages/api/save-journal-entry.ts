@@ -7,20 +7,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === 'POST') {
     try {
       const { transcript } = req.body;
-
-      if (!transcript || transcript.trim() === '') {
-        return res.status(400).json({ error: 'Empty transcript not allowed' });
-      }
+      console.log('Received transcript:', transcript); // Add this line
 
       const journalEntry = await prisma.journalEntry.create({
         data: {
-          transcript,
+          transcript: transcript.trim(),
         },
       });
 
+      console.log('Saved journal entry:', journalEntry); // Add this line
       res.status(200).json(journalEntry);
     } catch (error) {
-      res.status(500).json({ error: 'Failed to save journal entry' });
+      console.error('Error saving journal entry:', error);
+      res.status(500).json({ error: 'Error saving journal entry' });
     }
   } else {
     res.setHeader('Allow', ['POST']);

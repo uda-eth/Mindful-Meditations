@@ -25,7 +25,7 @@ const VoiceJournal: React.FC = () => {
       const response = await fetch('/api/get-journal-entries');
       if (response.ok) {
         const entries = await response.json();
-        console.log('Fetched entries:', entries); // Add this line
+        console.log('Fetched entries:', entries);
         setPastEntries(entries);
       } else {
         console.error('Failed to fetch entries:', response.statusText);

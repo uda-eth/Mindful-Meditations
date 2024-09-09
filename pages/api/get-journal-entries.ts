@@ -13,13 +13,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           },
         },
         orderBy: {
-          createdAt: 'desc',
-        },
+          createdAt: 'desc'
+        }
       });
-
+      console.log('Retrieved entries:', journalEntries); // Add this line
       res.status(200).json(journalEntries);
     } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch journal entries' });
+      console.error('Error fetching journal entries:', error);
+      res.status(500).json({ error: 'Error fetching journal entries' });
     }
   } else {
     res.setHeader('Allow', ['GET']);
