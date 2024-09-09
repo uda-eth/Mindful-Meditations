@@ -3,20 +3,13 @@ import { SpeechClient } from '@google-cloud/speech';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 const storage = new Storage({
-<<<<<<< HEAD
   projectId: process.env.GOOGLE_PROJECT_ID,
-=======
-  projectId: 'speech-to-text-project-434005', // Your project ID
->>>>>>> origin/main
 });
 const speechClient = new SpeechClient();
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   console.log('Transcribe API called');
-<<<<<<< HEAD
   let responseWasSent = false;
-
-=======
 
   if (req.method !== 'POST') {
     console.log('Method not allowed');
@@ -24,9 +17,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 
-  let responseWasSent = false;
-
->>>>>>> origin/main
   const sendResponse = (statusCode: number, data: any) => {
     if (!responseWasSent) {
       console.log(`Sending response: ${statusCode}`, data);
@@ -38,29 +28,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   };
 
   try {
-<<<<<<< HEAD
-    if (req.method !== 'POST') {
-      console.log('Method not allowed');
-      res.setHeader('Allow', ['POST']);
-      return res.status(405).end(`Method ${req.method} Not Allowed`);
+    console.log('Starting transcription process');
+    console.log('Processing request body');
+    console.log('Request body type:', typeof req.body);
+    
+    if (!req.body || req.body.length === 0) {
+      throw new Error('Empty request body');
     }
-
-    console.log('Processing request body');
-    console.log('Request body type:', typeof req.body);
+    
     console.log('Request body length:', req.body.length);
     
     const audioBuffer = req.body;
-    
-    const bucketName = 'udotong-audio-bucket';
-=======
-    console.log('Processing request body');
-    console.log('Request body type:', typeof req.body);
-    console.log('Request body length:', req.body.length);
-
-    const audioBuffer = req.body;
-    
-    const bucketName = 'udotong-audio-bucket'; // Replace with your actual bucket name
->>>>>>> origin/main
+    const bucketName = 'udotong-audio-bucket'; // Keep the original bucket name
     const fileName = `audio-${Date.now()}.wav`;
     console.log(`Uploading audio to ${fileName}`);
     
@@ -99,19 +78,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.log('Deleting audio file');
     await file.delete();
     console.log('Audio file deleted');
-
     sendResponse(200, { transcript: transcription });
   } catch (error) {
-<<<<<<< HEAD
     console.error('Error in transcribe API:', error);
     if (error instanceof Error) {
       sendResponse(500, { error: 'Server error', details: error.message });
-    } else {
-      sendResponse(500, { error: 'Server error', details: 'An unknown error occurred' });
-=======
-    console.error('Transcription error:', error);
-    if (error instanceof Error) {
-      sendResponse(500, { error: 'Error during transcription', details: error.message });
     } else {
       sendResponse(500, { error: 'Error during transcription', details: 'An unknown error occurred' });
     }
@@ -119,7 +90,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!responseWasSent) {
       console.log('No response was sent, sending 500 error');
       sendResponse(500, { error: 'Internal server error', details: 'No response was sent' });
->>>>>>> origin/main
     }
   }
 }
