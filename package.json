@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@google-cloud/error-reporting": "^3.0.5",
-    "@google-cloud/speech": "^6.7.0",
     "@google-cloud/storage": "^7.12.1",
     "@heroicons/react": "^2.1.5",
     "@prisma/client": "^5.19.1",
@@ -29,13 +28,16 @@
     "socket.io": "^4.7.5",
     "socket.io-client": "^4.7.5",
     "styled-components": "^6.1.13",
-    "uuid": "^10.0.0"
+    "uuid": "^10.0.0",
+    "ws": "^8.18.0"
   },
   "devDependencies": {
+    "@google-cloud/speech": "^6.7.0",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/socket.io-client": "^1.4.36",
+    "@types/ws": "^8.5.12",
     "eslint": "^8",
     "eslint-config-next": "14.2.7",
     "postcss": "^8",
