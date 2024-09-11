@@ -8,14 +8,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       console.log('Starting cleanup of empty entries');
 
+      const whereCondition = {
+        OR: [
+          { transcript: '' },
+          { transcript: { equals: '', mode: 'insensitive' } },
+          { transcript: { equals: null } },  // This line handles null values
+        ],
+      };
+
       const deletedEntries = await prisma.journalEntry.deleteMany({
-        where: {
-          OR: [
-            { transcript: '' },
-            { transcript: null },
-            { transcript: { equals: '', mode: 'insensitive' } },
-          ],
-        },
+        where: whereCondition,
       });
 
       console.log(`Deleted ${deletedEntries.count} empty entries`);
