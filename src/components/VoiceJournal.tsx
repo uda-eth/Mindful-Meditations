@@ -1,7 +1,6 @@
-'use client';
 import React, { useState, useEffect, useRef } from 'react';
-import styled from 'styled-components';
 import { io, Socket } from 'socket.io-client';
+import styles from './VoiceJournal.module.css';
 
 interface JournalEntry {
   id: string | number;
@@ -135,10 +134,10 @@ const VoiceJournal: React.FC = () => {
       </select>
       <div className="mt-4">
         <h3 className="text-lg font-semibold mb-2">Transcript:</h3>
-        <TranscriptDisplay>
+        <div className={styles.transcriptDisplay}>
           {finalTranscript}
-          <InterimTranscript>{transcript}</InterimTranscript>
-        </TranscriptDisplay>
+          <span className={styles.interimTranscript}>{transcript}</span>
+        </div>
       </div>
       {showPopup && selectedEntry && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
@@ -160,22 +159,5 @@ const VoiceJournal: React.FC = () => {
     </div>
   );
 };
-
-const TranscriptDisplay = styled.div`
-  background-color: #f8f8f8;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 16px;
-  margin-top: 16px;
-  font-family: 'Arial', sans-serif;
-  line-height: 1.6;
-  white-space: pre-wrap;
-  max-height: 300px;
-  overflow-y: auto;
-`;
-
-const InterimTranscript = styled.span`
-  color: #888;
-`;
 
 export default VoiceJournal;
